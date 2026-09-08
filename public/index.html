@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>자습 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root{--bg1:#fff4f8;--bg2:#eef7ff;--pink:#ff9fc4;--mint:#7fe3c9;--lav:#b9a7ff;--lemon:#ffd97a;--sky:#8fd0ff;--ink:#5b4a5a;--muted:#a99bb0;}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Jua',-apple-system,'Malgun Gothic',sans-serif;background:linear-gradient(160deg,var(--bg1),var(--bg2));color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .card{width:100%;max-width:460px;background:#fff;border-radius:32px;padding:30px 24px;border:3px solid #ffe4f0;box-shadow:0 16px 0 -6px #ffe0ec,0 22px 44px rgba(255,159,196,.26);}
+  h1{font-size:26px;color:#ff7fb0;text-align:center;margin-bottom:4px}
+  .sub{color:var(--muted);text-align:center;font-size:15px;margin-bottom:20px}
+  input{width:100%;padding:15px 18px;border:3px solid #ffe0ec;border-radius:18px;font-size:18px;background:#fffafc;color:var(--ink);margin-bottom:13px;outline:none;font-family:inherit}
+  input:focus{border-color:var(--pink)}
+  input::placeholder{color:#d8c7d4}
+  button{width:100%;padding:15px;border:none;border-radius:20px;font-size:19px;font-family:inherit;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--pink),var(--lav));box-shadow:0 8px 0 -1px #e98bc0;transition:transform .12s,box-shadow .12s}
+  button:active{transform:translateY(5px);box-shadow:0 3px 0 -1px #e98bc0}
+  .err{color:#ff6f8e;text-align:center;margin-top:10px;min-height:22px;font-size:15px}
+  .hidden{display:none}
+  .progtop{display:flex;justify-content:space-between;font-size:15px;color:var(--muted);margin-bottom:6px}
+  .progbar{height:12px;background:#ffe4f0;border-radius:999px;overflow:hidden;margin-bottom:16px}
+  .progfill{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--lav));transition:width .3s}
+  .qtext{font-size:21px;line-height:1.45;margin:6px 0 20px}
+  .opts{display:grid;gap:12px}
+  .opt{padding:16px 18px;border-radius:18px;font-size:18px;text-align:left;color:#fff;border:none;cursor:pointer;font-family:inherit;transition:transform .12s,box-shadow .12s}
+  .opt:nth-child(1){background:linear-gradient(135deg,#ffb0c9,#ff8fb6);box-shadow:0 6px 0 -1px #ee89ad}
+  .opt:nth-child(2){background:linear-gradient(135deg,#9ad8ff,#77c4ff);box-shadow:0 6px 0 -1px #6fb4ee}
+  .opt:nth-child(3){background:linear-gradient(135deg,#9ff0d8,#6fe0c1);box-shadow:0 6px 0 -1px #66cfb0}
+  .opt:nth-child(4){background:linear-gradient(135deg,#ffe08f,#ffcf5f);color:#8a6a2a;box-shadow:0 6px 0 -1px #efc056}
+  .opt:active{transform:translateY(4px)}
+  .opt.correct{outline:4px solid #4fc9a8}
+  .opt.wrong{outline:4px solid #ff8fb6;opacity:.6}
+  .opt:disabled{cursor:default}
+  .shortAns{width:100%;padding:15px 18px;border:3px solid #ffe0ec;border-radius:18px;font-size:18px;background:#fffafc;font-family:inherit;outline:none}
+  .fb{text-align:center;padding:8px 0}
+  .fb .badge{display:inline-block;padding:9px 20px;border-radius:999px;font-size:18px;color:#fff;margin:8px 0}
+  .ok{background:linear-gradient(135deg,#7fe3c9,#5fd3b5)}
+  .no{background:linear-gradient(135deg,#ffb0c9,#ff8fb6)}
+  .ansline{color:var(--muted);font-size:16px;margin-top:6px}
+  .nextb{margin-top:16px}
+  .done{text-align:center}
+  .done .emoji{font-size:58px;display:block;margin-bottom:6px}
+  .done .big{font-size:42px;color:var(--pink);margin:6px 0}
+  .done .line{color:var(--muted);font-size:16px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div id="join">
+    <h1>📝 자습 퀴즈</h1>
+    <p class="sub">이름과 학번을 넣고 시작하세요</p>
+    <input id="name" placeholder="이름" maxlength="20" />
+    <input id="sid" placeholder="학번" maxlength="20" />
+    <button id="startBtn">시작하기</button>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div id="quiz" class="hidden">
+    <div class="progtop"><span id="qnum"></span><span id="scoreNow">0점</span></div>
+    <div class="progbar"><div class="progfill" id="progFill"></div></div>
+    <div class="qtext" id="qtext"></div>
+    <div class="opts" id="opts"></div>
+    <input class="shortAns hidden" id="shortAns" placeholder="정답 입력 후 확인" />
+    <button class="nextb hidden" id="checkBtn">확인</button>
+    <div class="fb hidden" id="fb">
+      <span class="badge" id="fbBadge"></span>
+      <div class="ansline" id="ansLine"></div>
+      <button class="nextb" id="nextBtn">다음 →</button>
+    </div>
+  </div>
+
+  <div id="done" class="hidden">
+    <div class="done">
+      <span class="emoji">🎉</span>
+      <div>다 풀었어요!</div>
+      <div class="big" id="finalScore"></div>
+      <div class="line" id="finalLine"></div>
+      <button class="nextb" id="retryBtn" style="margin-top:20px">다시 풀기</button>
+      <div class="err" id="submitMsg" style="color:var(--mint)"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DECK = {
+  title: "의학용어 자습 퀴즈",
+  questions: [
+    { type:"mc", q:"'색상' 어근과 용어 연결이 올바르지 않은 것은?",
+      options:["melan/o — melanoma(흑색종)","leuk/o — leukemia(백혈병)","cyan/o — cyanosis(청색증)","erythr/o — (붉은)"], answer:2 },
+    { type:"short", q:"gastr/o + -itis 를 조립한 의학용어는?", answer:["gastritis"] },
+    { type:"mc", q:"접두사 peri- 의 의미는?", options:["안에(endo-)","위에(epi-)","아래에(sub-)","주위에(around)"], answer:3 },
+    { type:"short", q:"어근 cardi/o 가 의미하는 신체 부위는?", answer:["심장","heart"] },
+    { type:"mc", q:"연결모음 'o'가 생략되는 결합은?", options:["gastr/o+-megaly","cardi/o+-pathy","gastr/o+-itis","oste/o+-malacia"], answer:2 },
+    { type:"mc", q:"dysuria의 접두사 dys- 의 의미는?", options:["없는(a-/an-)","나쁜(mal-)","곤란/병적","초과(hyper-)"], answer:2 },
+    { type:"mc", q:"'필요시(PRN)'를 뜻하는 처방 약어는?", options:["NPO","PRN","stat","BID"], answer:1 },
+    { type:"short", q:"melan/o + -oma 로 만들어진 질환명은?", answer:["melanoma"] },
+    { type:"mc", q:"접미사 -phagia 의 의미는?", options:["소화","삼킴","구토","통증"], answer:1 },
+    { type:"mc", q:"접두사 intra- 의 의미는?", options:["밖의(extra-)","안의(within)","사이의(inter-)","초과(hyper-)"], answer:1 }
+  ]
+};
+
+const $=(id)=>document.getElementById(id);
+let student={}, pos=0, score=0, correctCount=0, answered=false;
+const TOTAL=DECK.questions.length;
+
+$('startBtn').onclick=()=>{
+  const name=$('name').value.trim(), sid=$('sid').value.trim();
+  if(!name||!sid){ $('err').textContent='이름과 학번을 모두 입력하세요'; return; }
+  student={name,sid};
+  $('join').classList.add('hidden'); $('quiz').classList.remove('hidden');
+  render();
+};
+
+function normalize(s){return String(s).trim().toLowerCase().replace(/\s+/g,'');}
+
+function render(){
+  answered=false;
+  const q=DECK.questions[pos];
+  $('qnum').textContent=`문제 ${pos+1} / ${TOTAL}`;
+  $('scoreNow').textContent=score+'점';
+  $('progFill').style.width=(pos/TOTAL*100)+'%';
+  $('qtext').textContent=q.q;
+  $('fb').classList.add('hidden');
+  const opts=$('opts'), shortAns=$('shortAns'), checkBtn=$('checkBtn');
+  opts.innerHTML='';
+  if(q.type==='mc'){
+    shortAns.classList.add('hidden'); checkBtn.classList.add('hidden'); opts.classList.remove('hidden');
+    q.options.forEach((o,i)=>{ const b=document.createElement('button'); b.className='opt'; b.textContent=o; b.onclick=()=>pick(i,b); opts.appendChild(b); });
+  } else {
+    opts.classList.add('hidden'); shortAns.classList.remove('hidden'); checkBtn.classList.remove('hidden');
+    shortAns.value=''; shortAns.disabled=false; shortAns.focus();
+    checkBtn.onclick=()=>{ if(shortAns.value.trim()) checkShort(); };
+    shortAns.onkeydown=(e)=>{ if(e.key==='Enter'&&shortAns.value.trim()) checkShort(); };
+  }
+}
+
+function pick(i,btn){
+  if(answered) return; answered=true;
+  const q=DECK.questions[pos];
+  const isCorrect=(i===q.answer);
+  document.querySelectorAll('.opt').forEach((b,bi)=>{ b.disabled=true; if(bi===q.answer)b.classList.add('correct'); });
+  if(!isCorrect) btn.classList.add('wrong');
+  finish(isCorrect, q.options[q.answer]);
+}
+function checkShort(){
+  if(answered) return; answered=true;
+  const q=DECK.questions[pos];
+  const val=$('shortAns').value;
+  const accepts=Array.isArray(q.answer)?q.answer:[q.answer];
+  const isCorrect=accepts.some(a=>normalize(a)===normalize(val));
+  $('shortAns').disabled=true; $('checkBtn').classList.add('hidden');
+  finish(isCorrect, accepts[0]);
+}
+function finish(isCorrect, correctText){
+  if(isCorrect){ score+=10; correctCount++; }
+  $('scoreNow').textContent=score+'점';
+  const badge=$('fbBadge');
+  badge.textContent=isCorrect?'정답! +10점':'오답';
+  badge.className='badge '+(isCorrect?'ok':'no');
+  $('ansLine').textContent=isCorrect?'':`정답: ${correctText}`;
+  $('fb').classList.remove('hidden');
+}
+$('nextBtn').onclick=()=>{
+  if(pos<TOTAL-1){ pos++; render(); } else showDone();
+};
+
+function showDone(){
+  $('quiz').classList.add('hidden'); $('done').classList.remove('hidden');
+  $('progFill').style.width='100%';
+  $('finalScore').textContent=score+'점';
+  $('finalLine').textContent=`${TOTAL}문제 중 ${correctCount}개 정답`;
+  submit();
+}
+function submit(){
+  fetch('/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:student.name,sid:student.sid,score,correct:correctCount,total:TOTAL})})
+    .then(r=>r.json()).then(d=>{ if(d.ok) $('submitMsg').textContent='✅ 제출 완료 (선생님이 확인할 수 있어요)'; })
+    .catch(()=>{ $('submitMsg').textContent='제출 저장에 실패했어요. 다시 시도해주세요.'; });
+}
+$('retryBtn').onclick=()=>{ pos=0;score=0;correctCount=0; $('done').classList.add('hidden'); $('quiz').classList.remove('hidden'); render(); };
+</script>
+</body>
+</html>
